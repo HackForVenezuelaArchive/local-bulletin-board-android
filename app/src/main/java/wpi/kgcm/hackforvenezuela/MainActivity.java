@@ -2,12 +2,14 @@ package wpi.kgcm.hackforvenezuela;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.support.constraint.solver.widgets.Snapshot;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -81,70 +83,14 @@ public class MainActivity extends AppCompatActivity {
         txtBody = findViewById(R.id.txtBody);
         btn = findViewById(R.id.btnSubmit);
 
+        AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+        alertDialog.setTitle("Welcome");
+        alertDialog.setMessage("Welcome to the location-based notice board app. You will only see posts from within 25km of your location.\n\n This app was created for WPI HackForVenezuela 2018 by Kit Zellerbach and Chris Myers.");
+        alertDialog.show();
+
+
         updateLocation();
         refresh();
-
-//
-//        myRef.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                arrayList.clear();
-//
-//                for (DataSnapshot contact : dataSnapshot.getChildren()) {
-//                    Post p = contact.getValue(Post.class);
-//                    arrayList.add(p);
-//                }
-//                arrayAdapter = new PostAdapter(arrayList, MainActivity.this);
-//                listView.setAdapter(arrayAdapter);
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-
-
-//        myRef.addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                Post post = dataSnapshot.getValue(Post.class);
-//
-//                Log.d(TAG, "Value is: " + post.getTitle());
-//
-//                arrayList.add(post);
-//                arrayAdapter = new PostAdapter(arrayList, MainActivity.this);
-//                listView.setAdapter(arrayAdapter);
-//            }
-//
-//            @Override
-//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-////                Post post = dataSnapshot.getValue(Post.class);
-////
-////                Log.d(TAG, "Title is: " + post.getTitle());
-////                Log.d(TAG, "Author is: " + post.getAuthor());
-////
-////                arrayAdapter = new PostAdapter(arrayList, MainActivity.this);
-////                listView.setAdapter(arrayAdapter);
-//
-//            }
-//
-//            @Override
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
     }
 
     @Override
@@ -163,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void refresh() {
-        if (!updateLocation()){
+        if (!updateLocation()) {
             Toast.makeText(MainActivity.this, "Can't access location! Refresh failed.",
                     Toast.LENGTH_LONG).show();
             return;
@@ -177,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                 for (DataSnapshot contact : snapshot.getChildren()) {
                     Post p = contact.getValue(Post.class);
 
-                    if (distance(latitude, longitude, p.getLat(),p.getLng()) < 25){
+                    if (distance(latitude, longitude, p.getLat(), p.getLng()) < 25) {
                         arrayList.add(p);
                     }
 
@@ -196,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onPress(View v) {
         Map<String, Object> updates = new HashMap<>();
-        if (!updateLocation()){
+        if (!updateLocation()) {
             Toast.makeText(MainActivity.this, "Can't access location! Post denied.",
                     Toast.LENGTH_LONG).show();
         }
@@ -233,16 +179,19 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    // Rights to the code below belongs to https://github.com/jasonwinn/haversine/blob/master/Haversine.java
+    // Thank you!
+
     private static final int EARTH_RADIUS = 6371; // Approx Earth radius in KM
 
     public static double distance(double startLat, double startLong,
                                   double endLat, double endLong) {
 
-        double dLat  = Math.toRadians((endLat - startLat));
+        double dLat = Math.toRadians((endLat - startLat));
         double dLong = Math.toRadians((endLong - startLong));
 
         startLat = Math.toRadians(startLat);
-        endLat   = Math.toRadians(endLat);
+        endLat = Math.toRadians(endLat);
 
         double a = haversin(dLat) + Math.cos(startLat) * Math.cos(endLat) * haversin(dLong);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
