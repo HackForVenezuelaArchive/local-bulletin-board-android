@@ -69,10 +69,9 @@ public class PostAdapter extends BaseAdapter {
         holder.body = (TextView) convertView.findViewById(R.id.text_body);
 
         Post post = postList.get(position);
+
         holder.title.setText(post.getTitle());
         holder.author.setText(post.getAuthor());
-
-
         Date pDate = new Date(post.getTimestamp());
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         holder.time.setText(dateFormat.format(pDate));
@@ -80,4 +79,6 @@ public class PostAdapter extends BaseAdapter {
 
         return convertView;
     }
+
+
 }
