@@ -1,6 +1,13 @@
 package wpi.kgcm.hackforvenezuela;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.support.constraint.solver.widgets.Snapshot;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     TextView txtBody;
     TextView txtAuthor;
     Button btn;
+    LocationManager lm;
 
     DatabaseReference myRef;
     ArrayList<Post> arrayList = new ArrayList<>();
@@ -47,11 +55,26 @@ public class MainActivity extends AppCompatActivity {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         myRef = database.getReference("posts");
 
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+            } else ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    0001);
+        } else {
+            // not granted
+        }
+
+
         listView = findViewById(R.id.listView);
         txtAuthor = findViewById(R.id.txtAuthor);
         txtTitle = findViewById(R.id.txtTitle);
         txtBody = findViewById(R.id.txtBody);
         btn = findViewById(R.id.btnSubmit);
+
+        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
 
         myRef.addValueEventListener(new ValueEventListener() {
@@ -78,9 +101,6 @@ public class MainActivity extends AppCompatActivity {
         myRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Toast.makeText(MainActivity.this, "This is my Toast message!",
-                        Toast.LENGTH_LONG).show();
-
                 Post post = dataSnapshot.getValue(Post.class);
 
                 Log.d(TAG, "Value is: " + post.getTitle());
@@ -121,8 +141,19 @@ public class MainActivity extends AppCompatActivity {
 
     public void onPress(View v) {
         Map<String, Object> updates = new HashMap<>();
+
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (location == null) {
+            Toast.makeText(MainActivity.this, "Can't access location! Post denied.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        double longitude = location.getLongitude();
+        double latitude = location.getLatitude();
+
         updates.put(UUID.randomUUID().toString(), new Post(txtTitle.getText().toString(),
-                txtAuthor.getText().toString(), txtBody.getText().toString(), new Date().getTime(), 0.0, 0.0));
+                txtAuthor.getText().toString(), txtBody.getText().toString(), new Date().getTime(), latitude, longitude));
 
         myRef.updateChildren(updates);
 
