@@ -7,7 +7,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class PostAdapter extends BaseAdapter {
 
@@ -37,6 +40,8 @@ public class PostAdapter extends BaseAdapter {
     private static class ViewHolder {
         private TextView title;
         private TextView author;
+        private TextView time;
+        private TextView body;
     }
 
     @Override
@@ -50,6 +55,8 @@ public class PostAdapter extends BaseAdapter {
             holder = new ViewHolder();
             holder.title = (TextView) convertView.findViewById(R.id.text_title);
             holder.author = (TextView) convertView.findViewById(R.id.text_author);
+            holder.time = (TextView) convertView.findViewById(R.id.text_time);
+            holder.body = (TextView) convertView.findViewById(R.id.text_body);
 
             convertView.setTag(holder);
         } else {
@@ -58,11 +65,18 @@ public class PostAdapter extends BaseAdapter {
 
         holder.title = (TextView) convertView.findViewById(R.id.text_title);
         holder.author = (TextView) convertView.findViewById(R.id.text_author);
-
+        holder.time = (TextView) convertView.findViewById(R.id.text_time);
+        holder.body = (TextView) convertView.findViewById(R.id.text_body);
 
         Post post = postList.get(position);
         holder.title.setText(post.getTitle());
         holder.author.setText(post.getAuthor());
+
+
+        Date pDate = new Date(post.getTimestamp());
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        holder.time.setText(dateFormat.format(pDate));
+        holder.body.setText(post.getBody());
 
         return convertView;
     }

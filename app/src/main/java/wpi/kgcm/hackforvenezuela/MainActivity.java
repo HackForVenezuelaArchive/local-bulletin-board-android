@@ -19,6 +19,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
     ListView listView;
     TextView txtTitle;
+    TextView txtBody;
     TextView txtAuthor;
     Button btn;
 
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         listView = findViewById(R.id.listView);
         txtAuthor = findViewById(R.id.txtAuthor);
         txtTitle = findViewById(R.id.txtTitle);
+        txtBody = findViewById(R.id.txtBody);
         btn = findViewById(R.id.btnSubmit);
 
 
@@ -118,7 +121,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void onPress(View v) {
         Map<String, Object> updates = new HashMap<>();
-        updates.put(UUID.randomUUID().toString(), new Post(txtTitle.getText().toString(), txtAuthor.getText().toString()));
+        updates.put(UUID.randomUUID().toString(), new Post(txtTitle.getText().toString(),
+                txtAuthor.getText().toString(), txtBody.getText().toString(), new Date().getTime(), 0.0, 0.0));
 
         myRef.updateChildren(updates);
 
